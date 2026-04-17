@@ -1,0 +1,62 @@
+name: Release (Windows)
+
+# Build the Electron Windows .exe on a native Windows runner and publish it
+# as a GitHub Release asset so players can download it directly.
+#
+# Triggers:
+#   - `v*` tag pushed   → full release with attached zip
+#   - manual dispatch   → build + upload as workflow artifact only (no release)
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-windows-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build Windows .exe
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci --prefer-offline --no-audit --no-fund
+
+      - name: Build Next.js + package Electron (Windows x64)
+        run: npm run dist:win
+        env:
+          NEXT_TELEMETRY_DISABLED: '1'
+          # electron-builder reads GH_TOKEN for publishing; we publish manually
+          # in the next step, so block its auto-publish behavior.
+          GH_TOKEN: ''
+
+      - name: Upload workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: kinetic-core-windows-x64
+          path: release/KINETIC-CORE-*-x64.zip
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Attach to GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: release/KINETIC-CORE-*-x64.zip
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+          fail_on_unmatched_files: true
