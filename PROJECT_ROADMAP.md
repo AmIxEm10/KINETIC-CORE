@@ -30,6 +30,10 @@
 ### Phase 4 : Équilibrage Automatique (Rôle `chaos-engineer`)
 - Créer un script de simulation qui fait tourner le jeu en accéléré pour ajuster les stats des ennemis et le coût des tours.
 
+### Phase 5 : "X-Factor" (Généré par l'IA)
+- L'agent `game-design` est autorisé et encouragé à modifier l'équilibrage ou à ajouter de nouvelles classes de tours/ennemis s'il estime que cela rend le jeu plus "Satisfying".
+- Tout ajout de feature non listé initialement doit être documenté dans un fichier `AI_FEATURES_ADDED.md` à la racine du projet pour que je puisse voir ce qui a été inventé.
+
 ## 📈 Critères de Succès
 - Score Lighthouse Performance > 90.
 - Expérience utilisateur "Ultra-Satisfying" (Transitions fluides, sons visuels).
