@@ -2,6 +2,10 @@
 const nextConfig = {
   reactStrictMode: true,
   transpilePackages: ['three'],
+  // `standalone` produces a self-contained Node server at `.next/standalone`.
+  // Electron spawns this bundle as a child process so the game ships with
+  // zero external runtime dependencies beyond the bundled Node.
+  output: 'standalone',
   experimental: {
     optimizePackageImports: ['framer-motion', '@react-three/drei']
   },

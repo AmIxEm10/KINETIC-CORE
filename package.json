@@ -2,7 +2,8 @@
   "name": "kinetic-core",
   "version": "0.1.0",
   "private": true,
-  "description": "KINETIC-CORE — An industrial-cyber circular tower defense built with Next.js 14 + React Three Fiber.",
+  "description": "Industrial-cyber circular tower defense.",
+  "main": "electron/main.js",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -11,7 +12,14 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "simulate": "tsx src/game/balance/simulate.ts"
+    "simulate": "tsx src/game/balance/simulate.ts",
+    "electron:dev": "cross-env ELECTRON_START_URL=http://localhost:3000 electron electron/main.js",
+    "electron:build": "next build",
+    "dist": "npm run electron:build && electron-builder",
+    "dist:win": "npm run electron:build && electron-builder --win --x64",
+    "dist:linux": "npm run electron:build && electron-builder --linux AppImage --x64",
+    "dist:all": "npm run electron:build && electron-builder -wl --x64",
+    "icon": "node electron/assets/generate-icon.js"
   },
   "dependencies": {
     "@react-three/drei": "^9.114.0",
@@ -31,6 +39,9 @@
     "@types/three": "^0.169.0",
     "@vitejs/plugin-react": "^4.3.2",
     "autoprefixer": "^10.4.20",
+    "cross-env": "^7.0.3",
+    "electron": "^32.2.0",
+    "electron-builder": "^25.1.8",
     "eslint": "^8.57.1",
     "eslint-config-next": "14.2.15",
     "jsdom": "^25.0.1",
@@ -39,5 +50,73 @@
     "tsx": "^4.19.1",
     "typescript": "^5.6.3",
     "vitest": "^2.1.2"
+  },
+  "build": {
+    "appId": "com.amixem.kineticcore",
+    "productName": "KINETIC-CORE",
+    "copyright": "Copyright © 2026 KINETIC-CORE",
+    "artifactName": "${productName}-${version}-${os}-${arch}.${ext}",
+    "asar": true,
+    "compression": "maximum",
+    "directories": {
+      "output": "release",
+      "buildResources": "electron/assets"
+    },
+    "files": [
+      "electron/**/*",
+      "!electron/assets/generate-icon.js",
+      "public/**/*",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": ".next/standalone",
+        "to": "app/.next/standalone",
+        "filter": ["**/*"]
+      },
+      {
+        "from": ".next/static",
+        "to": "app/.next/standalone/.next/static",
+        "filter": ["**/*"]
+      },
+      {
+        "from": "public",
+        "to": "app/.next/standalone/public",
+        "filter": ["**/*"]
+      }
+    ],
+    "win": {
+      "target": [
+        { "target": "zip", "arch": ["x64"] },
+        { "target": "dir", "arch": ["x64"] }
+      ],
+      "icon": "electron/assets/icon.png",
+      "artifactName": "${productName}-${version}-${arch}.${ext}",
+      "publisherName": "KINETIC-CORE Team",
+      "signAndEditExecutable": false
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "KINETIC-CORE",
+      "uninstallDisplayName": "KINETIC-CORE",
+      "artifactName": "${productName}-${version}-Setup-${arch}.${ext}"
+    },
+    "portable": {
+      "artifactName": "${productName}-${version}-Portable-${arch}.${ext}"
+    },
+    "linux": {
+      "target": [{ "target": "AppImage", "arch": ["x64"] }],
+      "category": "Game",
+      "icon": "electron/assets/icon.png"
+    },
+    "mac": {
+      "target": [{ "target": "dmg", "arch": ["x64", "arm64"] }],
+      "category": "public.app-category.games",
+      "icon": "electron/assets/icon.png"
+    }
   }
 }
